@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f5f7">
+    <meta name="automd-token" content="__AUTOMD_TOKEN__">
+    <title>Auto-MD</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script type="module" src="/static/app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand" aria-label="Auto-MD">
+          <span class="brand-mark" aria-hidden="true">A</span>
+          <span>Auto-MD</span>
+          <span class="version">2.0</span>
+        </div>
+
+        <div class="header-actions">
+          <div class="local-status" title="Listening only on this computer">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>Local</span>
+          </div>
+          <button class="icon-button" id="settingsButton" type="button" aria-label="Open settings" aria-controls="settingsDrawer" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.63 15 1.7 1.7 0 0 0 3.08 14H3v-4h.08A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.63 1.7 1.7 0 0 0 10 3.08V3h4v.08A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.37 9 1.7 1.7 0 0 0 20.92 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+          </button>
+          <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle color theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42M18.36 5.64l-1.42 1.42M7.06 16.94l-1.42 1.42M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel sources-panel" aria-labelledby="sourcesTitle">
+          <div class="panel-heading">
+            <h1 id="sourcesTitle">Sources</h1>
+            <span class="count-badge" id="sourceCount">0</span>
+          </div>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Add files or folders">
+            <div class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+            </div>
+            <div class="drop-copy">
+              <strong>Drop files or folders</strong>
+              <span>or choose from this computer</span>
+            </div>
+            <div class="drop-actions">
+              <button class="button secondary compact" id="chooseFiles" type="button">Files</button>
+              <button class="button secondary compact" id="chooseFolder" type="button">Folder</button>
+            </div>
+            <input id="fileInput" type="file" multiple hidden>
+            <input id="folderInput" type="file" multiple webkitdirectory hidden>
+          </div>
+
+          <div class="remote-row">
+            <label class="visually-hidden" for="urlInput">Repository or web page URL</label>
+            <input id="urlInput" type="url" placeholder="Repository or page URL" autocomplete="url">
+            <label class="visually-hidden" for="refInput">Git ref</label>
+            <input class="ref-input" id="refInput" type="text" placeholder="Ref" autocomplete="off">
+            <button class="button secondary add-button" id="addUrl" type="button" aria-label="Add URL">Add</button>
+          </div>
+
+          <div class="source-list" id="sourceList" aria-live="polite"></div>
+        </section>
+
+        <section class="panel output-panel" id="outputPanel" aria-live="polite">
+          <form class="pane-view active" id="setupView" data-view="setup" novalidate>
+            <div class="panel-heading output-heading">
+              <div>
+                <h1>Output</h1>
+                <span class="mode-status" id="setupStatus">Add a source</span>
+              </div>
+              <button class="text-button" id="editSettings" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10m4 0h2M4 17h2m4 0h10M14 4v6M6 14v6"/></svg>
+                Settings
+              </button>
+            </div>
+
+            <div class="setup-content">
+              <fieldset class="output-mode">
+                <legend>Format</legend>
+                <div class="segmented-control">
+                  <label class="segment selected">
+                    <input type="radio" name="outputMode" value="markdown" checked>
+                    <span>.md</span>
+                    Markdown
+                  </label>
+                  <label class="segment">
+                    <input type="radio" name="outputMode" value="rag">
+                    <span>{ }</span>
+                    RAG bundle
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="field output-name-field">
+                <label for="outputName">Name</label>
+                <div class="suffix-input">
+                  <input id="outputName" type="text" maxlength="120" placeholder="automd-output" autocomplete="off">
+                  <span id="outputSuffix">.md</span>
+                </div>
+              </div>
+
+              <div class="setting-summary" aria-label="Active settings">
+                <span id="filterSummary">Smart filter</span>
+                <span id="ocrSummary">OCR auto</span>
+                <span id="detailSummary">TOC on</span>
+              </div>
+            </div>
+
+            <div class="setup-footer">
+              <span class="ready-note" id="readyNote">Waiting for sources</span>
+              <button class="button primary create-button" id="convertButton" type="submit" disabled>
+                <span>Create .md</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </form>
+
+          <section class="pane-view processing-view" id="processingView" data-view="processing" aria-hidden="true">
+            <div class="panel-heading">
+              <h1>Processing</h1>
+              <span class="percent" id="statusPercent">0%</span>
+            </div>
+            <div class="processing-content">
+              <div class="processing-mark" aria-hidden="true"><span></span></div>
+              <h2 id="statusTitle">Preparing sources</h2>
+              <p id="statusMessage">Starting…</p>
+              <div class="progress-track" role="progressbar" aria-label="Conversion progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressBar"></div></div>
+              <details class="activity">
+                <summary>Activity</summary>
+                <ol id="activityLog"></ol>
+              </details>
+            </div>
+            <div class="pane-footer centered">
+              <button class="button secondary danger" id="cancelButton" type="button">Cancel</button>
+            </div>
+          </section>
+
+          <section class="pane-view result-view" id="resultView" data-view="result" aria-hidden="true">
+            <div class="panel-heading result-heading">
+              <div>
+                <div class="ready-label"><span aria-hidden="true">✓</span> Ready</div>
+                <h1 id="resultTitle">Output ready</h1>
+              </div>
+              <button class="text-button" id="newJobButton" type="button">New</button>
+            </div>
+            <p class="result-summary" id="resultSummary"></p>
+            <div class="result-actions">
+              <a class="button primary" id="downloadButton" href="#" download>Download</a>
+              <button class="button secondary" id="copyButton" type="button">Copy</button>
+            </div>
+            <div class="preview-shell" id="previewShell">
+              <div class="preview-header"><span>Preview</span><span id="previewName"></span></div>
+              <pre id="preview"></pre>
+            </div>
+            <div class="bundle-panel hidden" id="bundlePanel">
+              <span class="bundle-icon" aria-hidden="true">{ }</span>
+              <strong>RAG bundle created</strong>
+              <span>Markdown, chunks, and manifest are packaged in the ZIP.</span>
+            </div>
+          </section>
+
+          <section class="pane-view error-view" id="errorView" data-view="error" aria-hidden="true">
+            <div class="error-content">
+              <span class="error-mark" aria-hidden="true">!</span>
+              <h1 id="errorTitle">Conversion failed</h1>
+              <p id="errorMessage"></p>
+              <button class="button secondary" id="errorBackButton" type="button">Back to setup</button>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+    <aside class="settings-drawer" id="settingsDrawer" aria-labelledby="settingsTitle" aria-hidden="true">
+      <div class="drawer-heading">
+        <div>
+          <span>Output</span>
+          <h2 id="settingsTitle">Settings</h2>
+        </div>
+        <button class="icon-button" id="closeSettings" type="button" aria-label="Close settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <div class="drawer-content">
+        <div class="field">
+          <label for="filterMode">File filtering</label>
+          <select id="filterMode">
+            <option value="smart">Smart defaults</option>
+            <option value="project">Project ignores only</option>
+            <option value="all">All supported files</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ocrMode">OCR</label>
+          <select id="ocrMode">
+            <option value="auto">Automatic</option>
+            <option value="always">Always</option>
+            <option value="never">Off</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="excludePatterns">Exclude patterns</label>
+          <textarea id="excludePatterns" rows="4" placeholder="docs/generated/**"></textarea>
+        </div>
+        <div class="field">
+          <label for="includePatterns">Force includes</label>
+          <textarea id="includePatterns" rows="3" placeholder="src/generated/important.ts"></textarea>
+        </div>
+        <div class="toggle-group">
+          <label class="check-row"><input id="includeToc" type="checkbox" checked><span>Table of contents</span></label>
+          <label class="check-row"><input id="notebookOutputs" type="checkbox"><span>Notebook outputs</span></label>
+        </div>
+        <div class="chunk-settings hidden" id="chunkSettings">
+          <div class="drawer-section-label">RAG chunks</div>
+          <div class="chunk-grid">
+            <div class="field"><label for="chunkTarget">Target</label><input id="chunkTarget" type="number" min="200" max="4000" value="800"></div>
+            <div class="field"><label for="chunkOverlap">Overlap</label><input id="chunkOverlap" type="number" min="0" max="1000" value="100"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="button primary" id="doneSettings" type="button">Done</button>
+      </div>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

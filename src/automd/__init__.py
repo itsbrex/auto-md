@@ -1,0 +1,3 @@
+"""Auto-MD local document ingestion application."""
+
+__version__ = "2.0.0"

@@ -1,5 +1,0 @@
-tkinter
-pygit2
-chardet
-python-magic
-tqdm

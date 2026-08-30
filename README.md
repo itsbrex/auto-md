@@ -1,129 +1,88 @@
-# ~auto~md~
+# Auto-MD
 
-## On-going development & updates via https://github.com/toolworks-dev/auto-md
-### (this is just my personal python tool script version in this repo)
+Auto-MD turns codebases and documents into one clean Markdown file or a RAG-ready bundle. It runs as a private local web app: your files are processed on your machine and temporary data is removed when the app exits.
 
------------------------------------------------------------------------------------------------
-### Python tool that converts various file types and GitHub repositories into Markdown documents (.md) optimized for quick RAG/indexing via large language models (LLMs)
+## Run it
 
-Try the web version at https://automd.toolworks.dev
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), clone or download this repository, then run:
 
-![screen](auto-md-gui-screen.png)
-
-## Features
-
-- Supports multiple file types (see table below)
-- Processes zip files/folders/individual files and GitHub repositories
-- Generates a single Markdown file or multiple files
-- Creates a table of contents and metadata for each file processed
-
-## Supported File Extensions
-
-| Category | Extensions |
-|----------|------------|
-| Text | .txt, .text, .log |
-| Markdown | .md, .markdown, .mdown, .mkdn, .mkd, .mdwn, .mdtxt, .mdtext |
-| Web | .html, .htm, .xhtml, .shtml, .css, .scss, .sass, .less |
-| Programming | .py, .pyw, .js, .jsx, .ts, .tsx, .java, .c, .cpp, .cs, .go, .rb, .php, .swift, .kt |
-| Data | .json, .jsonl, .yaml, .yml, .xml, .csv, .tsv |
-| Config | .ini, .cfg, .conf, .config, .toml, .editorconfig |
-| Shell | .sh, .bash, .zsh, .fish, .bat, .cmd, .ps1 |
-| Other | .rst, .tex, .sql, .r, .lua, .pl, .scala, .clj, .ex, .hs, .ml, .rs, .vim |
-
-## Quick Setup Guide
-
-1. Install Python 3.7 or newer
-
-2. Download this project (or clone repo like normal):
-   - Click the green "Code" button above
-   - Choose "Download ZIP"
-   - Extract the ZIP file
-
-3. Open a terminal/command prompt and navigate to the extracted folder:
-   ```
-   cd path/to/Auto-MD
-   ```
-
-4. Install required packages:
-   ```
-   pip install -r requirements.txt
-   ```
-
-5. Run the application:
-   ```
-   python main.py
-   ```
-
-6. Use the GUI to:
-   - Select input files/folders
-   - Choose output location
-   - Set processing options
-   - Click "Start Processing"
-
-## Example Input/Output
-
-### Input
-
-Let's say you have the following files in a folder called "my_project":
-
-- README.md
-- script.py
-- data.json
-- styles.css
-
-### Output
-
-After processing with Auto MD, you would get a single Markdown file (`output.md`) that looks like the example below
-
-This single .md file contains all the content from your input files, with a table of contents at the top for easy navigation and referencing / indexing via LLM models
-
-```markdown
-# Auto MD Output
-
-## Table of Contents
-- [README](#readme)
-- [script](#script)
-- [data](#data)
-- [styles](#styles)
-
----
-
-# README
-
-## Metadata
-- **Generated on:** 2024-06-30 16:30:15
-- **Source:** my_project
-
-(Content of README.md)
-
----
-
-# script
-
-## Metadata
-- **Generated on:** 2024-06-30 16:30:16
-- **Source:** my_project
-
-(Content of script.py)
-
----
-
-# data
-
-## Metadata
-- **Generated on:** 2024-06-30 16:30:17
-- **Source:** my_project
-
-(Content of data.json)
-
----
-
-# styles
-
-## Metadata
-- **Generated on:** 2024-06-30 16:30:18
-- **Source:** my_project
-
-(Content of styles.css)
+```bash
+uv run automd.py
 ```
+
+Auto-MD installs its locked Python environment, starts on `127.0.0.1`, chooses an available port, and opens your browser. Press `Ctrl-C` in the terminal to stop it and clear all job data.
+
+Useful local-development options:
+
+```bash
+uv run automd.py --no-browser
+uv run automd.py --port 8765
+uv run automd.py --log-level info
+```
+
+Docker, Node.js, Tesseract, Git, API keys, and cloud services are not required to run the app. Node.js is used only when changing the TypeScript frontend.
+
+## Inputs
+
+- Files and browser-selected folders
+- Public GitHub repositories, optionally at a specific ref
+- Individual public HTTP(S) web pages
+- ZIP and TAR archives, including safely bounded nested archives
+- Code, text, Markdown, configuration, JSON/YAML/XML, CSV, and notebooks
+- HTML, DOCX, PDF, and common image formats
+- Scanned PDFs and images through local English-capable OCR
+
+Smart filtering respects `.gitignore` and `.automdignore` and removes common dependency, cache, build, and generated paths. Advanced settings allow force-includes and additional git-style excludes.
+
+## Outputs
+
+Clean Markdown produces one `.md` file with provenance, stable anchors, a table of contents, and faithfully fenced source content.
+
+RAG bundle produces a ZIP containing:
+
+- the complete Markdown document;
+- `chunks.jsonl` with stable IDs, source metadata, heading paths, hashes, and token estimates;
+- `manifest.json` with settings, checksums, skips, warnings, and counts.
+
+Chunking follows headings, paragraphs, pages, notebook cells, and code boundaries. Counts are deterministic estimates rather than model-specific token counts.
+
+## Privacy and safety
+
+- The server binds only to loopback and does not support public/LAN hosting.
+- Auto-MD makes outbound requests only for URLs you explicitly add.
+- Upload names never become server paths without normalization.
+- Archive paths, links, entry counts, expanded sizes, PDF pages, image pixels, downloads, and redirects are bounded.
+- Remote URLs cannot target loopback, private, or link-local networks.
+- Downloads use registered artifact IDs rather than filesystem paths.
+- No analytics, CDNs, cookies beyond the local session, or AI APIs are used.
+
+The practical default limits are 512 MiB per job, 100 MiB per file, 20,000 archive entries, 1 GiB expanded data, 500 PDF pages, and 50 megapixels per image.
+
+## Development
+
+Backend:
+
+```bash
+uv sync --group dev
+uv run ruff check .
+uv run mypy
+uv run pytest --cov=automd
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm install
+npm run check
+npm run build
+```
+
+## Supported platforms
+
+Auto-MD targets Python 3.11–3.14 on current Windows, macOS, and Linux systems supported by its OCR/PDF wheels. Browser support targets current Chrome, Edge, Firefox, and Safari releases.
+
+## License
+
+[MIT](LICENSE)
 
